@@ -1,9 +1,11 @@
+import sun.tools.jar.resources.jar
+
 plugins {
     id("java")
 }
 
 group = "com.valentinstamate"
-version = "1.0-SNAPSHOT"
+version = "1.0"
 
 repositories {
     mavenCentral()
@@ -17,4 +19,10 @@ dependencies {
 
 tasks.test {
     useJUnitPlatform()
+}
+
+tasks.jar {
+    manifest {
+        attributes["Main-Class"] = "com.valentinstamate.Main"
+    }
 }

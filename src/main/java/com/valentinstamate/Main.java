@@ -1,84 +1,95 @@
-public static final Set<String> RAW_FORMATS = Set.of(".raw", ".arw");
+package com.valentinstamate;
 
-void main() throws IOException {
-    String currentDir = Path.of("").toAbsolutePath().toString();
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
-    IO.println("Searching for files in " + currentDir + "...");
+class Main {
 
-    try (Stream<Path> stream = Files.list(Path.of("."))) {
-        Map<String, Set<String>> filesMap = new HashMap<>();
+    private static final Set<String> RAW_FORMATS = Set.of(".raw", ".arw");
 
-        List<Path> files = stream
-                .filter(p -> !Files.isDirectory(p))
-                .toList();
+    public static void main(String[] args) throws Exception {
+        String currentDir = Path.of("").toAbsolutePath().toString();
 
-        files.forEach(path -> {
-            String filename = path.getFileName().toString().substring(2);
-            String key = extractFilename(filename);
+        IO.println("Searching for files in " + currentDir + "...");
 
-            filesMap.computeIfAbsent(key, _ -> new HashSet<>())
-                    .add(filename);
-        });
+        try (Stream<Path> stream = Files.list(Path.of("."))) {
+            Map<String, Set<String>> filesMap = new HashMap<>();
 
-        Set<String> filesToDelete = filesMap.values().stream()
-                .map(mappedFiles -> {
-                    Set<String> rawFiles = mappedFiles.stream()
-                            .filter(filename -> {
-                                String extension = extractExtension(filename);
-                                return RAW_FORMATS.contains(extension.toLowerCase());
-                            })
-                            .collect(Collectors.toSet());
+            List<Path> files = stream
+                    .filter(p -> !Files.isDirectory(p))
+                    .toList();
 
-                    Set<String> compressedFiles = new HashSet<>(mappedFiles);
-                    compressedFiles.removeAll(rawFiles);
+            files.forEach(path -> {
+                String filename = path.getFileName().toString().substring(2);
+                String key = extractFilename(filename);
 
-                    if (compressedFiles.isEmpty()) {
-                        return rawFiles;
-                    }
+                filesMap.computeIfAbsent(key, _ -> new HashSet<>())
+                        .add(filename);
+            });
 
-                    return Set.<String>of();
-                })
-                .flatMap(Set::stream)
-                .collect(Collectors.toSet());
+            Set<String> filesToDelete = filesMap.values().stream()
+                    .map(mappedFiles -> {
+                        Set<String> rawFiles = mappedFiles.stream()
+                                .filter(filename -> {
+                                    String extension = extractExtension(filename);
+                                    return RAW_FORMATS.contains(extension.toLowerCase());
+                                })
+                                .collect(Collectors.toSet());
 
-        if (!filesToDelete.isEmpty()) {
-            IO.println("Found the following files to delete:");
-            filesToDelete.forEach(IO::println);
-        } else {
-            IO.println("No file to delete found.");
-            return;
-        }
+                        Set<String> compressedFiles = new HashSet<>(mappedFiles);
+                        compressedFiles.removeAll(rawFiles);
 
-        Scanner scanner = new Scanner(System.in);
-        IO.println("Do you want to continue? (y/n)");
-        String input = scanner.nextLine().trim();
+                        if (compressedFiles.isEmpty()) {
+                            return rawFiles;
+                        }
 
-        if (!input.equals("y")) {
-            return;
-        }
+                        return Set.<String>of();
+                    })
+                    .flatMap(Set::stream)
+                    .collect(Collectors.toSet());
 
-        Set<String> filePathsToDelete = filesToDelete.stream()
-                .map(filename -> String.format("%s\\%s", currentDir, filename))
-                .collect(Collectors.toSet());
+            if (!filesToDelete.isEmpty()) {
+                IO.println("Found the following files to delete:");
+                filesToDelete.forEach(IO::println);
+            } else {
+                IO.println("No file to delete found.");
+                return;
+            }
 
-        for (String filePath : filePathsToDelete) {
-            IO.print("Deleting " + filePath);
-            boolean deleted = Files.deleteIfExists(Path.of(filePath));
-            IO.println(" " + deleted);
+            Scanner scanner = new Scanner(System.in);
+            IO.println("Do you want to continue? (y/n)");
+            String input = scanner.nextLine().trim();
+
+            if (!input.equals("y")) {
+                return;
+            }
+
+            Set<String> filePathsToDelete = filesToDelete.stream()
+                    .map(filename -> String.format("%s\\%s", currentDir, filename))
+                    .collect(Collectors.toSet());
+
+            for (String filePath : filePathsToDelete) {
+                IO.print("Deleting " + filePath);
+                boolean deleted = Files.deleteIfExists(Path.of(filePath));
+                IO.println(" " + deleted);
+            }
         }
     }
-}
 
-private String extractFilename(String filename) {
-    int dotIndex = filename.lastIndexOf(".");
-    return dotIndex > 0
-            ? filename.substring(0, dotIndex)
-            : filename;
-}
+    private static String extractFilename(String filename) {
+        int dotIndex = filename.lastIndexOf(".");
+        return dotIndex > 0
+                ? filename.substring(0, dotIndex)
+                : filename;
+    }
 
-private String extractExtension(String filename) {
-    int dotIndex = filename.lastIndexOf(".");
-    return dotIndex > 0
-            ? filename.substring(dotIndex)
-            : "";
+    private static String extractExtension(String filename) {
+        int dotIndex = filename.lastIndexOf(".");
+        return dotIndex > 0
+                ? filename.substring(dotIndex)
+                : "";
+    }
 }
