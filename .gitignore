@@ -43,3 +43,6 @@ gradlew
 gradlew.bat
 
 test
+*.jpg
+*.raw
+*.arw

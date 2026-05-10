@@ -11,6 +11,15 @@ class Main {
     private static final Set<String> RAW_FORMATS = Set.of(".raw", ".arw");
 
     public static void main(String[] args) throws Exception {
+        try {
+            removeFiles();
+        } catch (Exception e) {
+            IO.println("Exception thrown while removing files. Cause:");
+            e.printStackTrace();
+        }
+    }
+
+    private static void removeFiles() throws Exception {
         String currentDir = Path.of("").toAbsolutePath().toString();
 
         IO.println("Searching for files in " + currentDir + "...");
@@ -23,7 +32,7 @@ class Main {
                     .toList();
 
             files.forEach(path -> {
-                String filename = path.getFileName().toString().substring(2);
+                String filename = path.getFileName().toString();
                 String key = extractFilename(filename);
 
                 filesMap.computeIfAbsent(key, _ -> new HashSet<>())
@@ -55,7 +64,7 @@ class Main {
                 IO.println("Found the following files to delete:");
                 filesToDelete.forEach(IO::println);
             } else {
-                IO.println("No file to delete found.");
+                IO.println("No files to delete found.");
                 return;
             }
 
@@ -72,9 +81,8 @@ class Main {
                     .collect(Collectors.toSet());
 
             for (String filePath : filePathsToDelete) {
-                IO.print("Deleting " + filePath);
-                boolean deleted = Files.deleteIfExists(Path.of(filePath));
-                IO.println(" " + deleted);
+                IO.println("Deleting " + filePath);
+                Files.delete(Path.of(filePath));
             }
         }
     }
