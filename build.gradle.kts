@@ -1,5 +1,3 @@
-import sun.tools.jar.resources.jar
-
 plugins {
     id("java")
 }
@@ -25,4 +23,5 @@ tasks.jar {
     manifest {
         attributes["Main-Class"] = "com.valentinstamate.Main"
     }
+    archiveFileName.set("remover.jar")
 }

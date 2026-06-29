@@ -10,7 +10,7 @@ class Main {
 
     private static final Set<String> RAW_FORMATS = Set.of(".raw", ".arw");
 
-    public static void main(String[] args) throws Exception {
+    static void main() {
         try {
             removeFiles();
         } catch (Exception e) {
@@ -77,7 +77,7 @@ class Main {
             }
 
             Set<String> filePathsToDelete = filesToDelete.stream()
-                    .map(filename -> String.format("%s\\%s", currentDir, filename))
+                    .map(filename -> String.format("%s/%s", currentDir, filename))
                     .collect(Collectors.toSet());
 
             for (String filePath : filePathsToDelete) {
